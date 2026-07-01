@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="is">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0a425a" />
+  <title>Sjósund Nauthólsvík</title>
+  <style>
+    :root{
+      --bg:#061522; --text:#f7fcff; --muted:#b5ccd7;
+      --blue:#35c9ff; --cyan:#74f0ff; --green:#70ffb0;
+      --yellow:#ffd45e; --pink:#ff6fb1;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; color:var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(116,240,255,.34), transparent 34%),
+        radial-gradient(circle at 85% 12%, rgba(255,111,177,.22), transparent 30%),
+        linear-gradient(180deg,#0a425a 0%, #071a2a 55%, #050f1b 100%);
+    }
+    .app{max-width:470px;margin:auto;padding:18px 16px 34px}
+    .top{display:flex;justify-content:flex-start;align-items:center;margin:10px 0 18px}
+    .title{
+      font-size:30px; line-height:1.02; font-weight:950; letter-spacing:-1px;
+      background:linear-gradient(90deg,#ffffff,#74f0ff,#ffd45e);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .sub,.small{font-size:12px;color:var(--muted)}
+    .pill{
+      border:1px solid rgba(116,240,255,.32);
+      background:linear-gradient(135deg,rgba(116,240,255,.22),rgba(157,124,255,.18));
+      border-radius:999px; padding:9px 12px; font-size:12px; font-weight:850;
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+    }
+    .hero{
+      border:1px solid rgba(255,255,255,.18); border-radius:32px; padding:18px;
+      background:linear-gradient(135deg,rgba(53,201,255,.22),rgba(255,111,177,.12) 45%,rgba(255,212,94,.10));
+      box-shadow:0 20px 40px rgba(0,0,0,.28);
+    }
+    .row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+    .label{font-size:13px;color:#d8eef6;font-weight:700}
+    .big{font-size:54px;font-weight:950;letter-spacing:-2.5px;line-height:1}
+    .medium{font-size:31px;font-weight:950;letter-spacing:-.8px}
+    .state{color:var(--green);font-weight:950;margin-top:4px}
+    .next{
+      text-align:right; min-width:116px;
+      background:rgba(255,212,94,.13); border:1px solid rgba(255,212,94,.22);
+      border-radius:22px; padding:12px;
+    }
+    .tideDate{
+      margin:14px 2px 8px;
+      padding:10px 13px;
+      border-radius:18px;
+      display:inline-flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:3px;
+      background:rgba(116,240,255,.13);
+      border:1px solid rgba(116,240,255,.24);
+      color:#ffffff;
+      font-size:12px;
+      font-weight:850;
+      line-height:1.25;
+    }
+    .tideDate .subline{
+      color:#d8eef6;
+      font-weight:800;
+    }
+    .chart{
+      margin-top:16px; border-radius:24px; padding:10px;
+      background:linear-gradient(180deg,rgba(3,17,29,.42),rgba(3,17,29,.20));
+      border:1px solid rgba(116,240,255,.18);
+    }
+    svg{width:100%;height:205px;display:block;overflow:visible}
+    .measurementUpdated{
+      margin:14px 2px 8px; padding:9px 12px; border-radius:999px;
+      display:inline-flex; align-items:center; gap:10px; flex-wrap:wrap;
+      background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.16);
+      color:#ffffff; font-size:12px; font-weight:850;
+    }
+    .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+    .metric{
+      border:1px solid rgba(255,255,255,.16); border-radius:23px; padding:14px 12px;
+      min-height:112px; box-shadow:0 10px 20px rgba(0,0,0,.14);
+    }
+    .metric:nth-child(1){background:linear-gradient(160deg,rgba(53,201,255,.34),rgba(116,240,255,.12));border-color:rgba(116,240,255,.34)}
+    .metric:nth-child(2){background:linear-gradient(160deg,rgba(255,212,94,.32),rgba(255,157,77,.12));border-color:rgba(255,212,94,.34)}
+    .metric:nth-child(3){background:linear-gradient(160deg,rgba(112,255,176,.28),rgba(157,124,255,.13));border-color:rgba(112,255,176,.30)}
+    .metric .value{font-size:29px;font-weight:950;letter-spacing:-1px;margin-top:5px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.20)}
+    .section{font-size:19px;font-weight:950;margin:23px 0 10px;letter-spacing:-.3px}
+    .events{display:grid;gap:10px}
+    .event{
+      display:flex;align-items:center;justify-content:space-between;
+      border:1px solid rgba(255,255,255,.15); border-radius:20px; padding:14px 15px;
+      box-shadow:0 8px 18px rgba(0,0,0,.13);
+    }
+    .event:nth-child(odd){background:linear-gradient(135deg,rgba(53,201,255,.19),rgba(116,240,255,.07))}
+    .event:nth-child(even){background:linear-gradient(135deg,rgba(255,212,94,.20),rgba(255,157,77,.08))}
+    .event b{font-size:15px}.event span{font-size:12px;color:var(--muted)}
+    .event strong{font-size:17px;background:rgba(255,255,255,.12);border-radius:999px;padding:7px 10px}
+    .footer{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="top">
+      <div>
+        <div class="title">Sjósund<br>Nauthólsvík</div>
+        <div class="sub">Flóð • fjara • sjávarhiti</div>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="row">
+        <div>
+          <div class="label">Flóðastaða núna</div>
+          <div class="big" id="currentHeight">—</div>
+          <div class="state" id="tideState">—</div>
+        </div>
+        <div class="next">
+          <div class="label">Næsta flóð/fjara</div>
+          <div class="medium" id="nextTime">—</div>
+          <div class="small" id="nextHeight">—</div>
+        </div>
+      </div>
+
+      <div class="tideDate" id="tideDate">Flóðagögn: —</div>
+      <div class="chart">
+        <svg id="tideChart" viewBox="0 0 390 205"></svg>
+      </div>
+
+      <div class="measurementUpdated" id="measurementUpdated">Síðasta athugun: —</div>
+
+      <div class="grid">
+        <div class="metric">
+          <div class="label">Sjávarhiti</div>
+          <div class="value" id="seaTemp">—</div>
+          <div class="small">Nauthólsvík</div>
+        </div>
+        <div class="metric">
+          <div class="label">Lofthiti</div>
+          <div class="value" id="airTemp">—</div>
+          <div class="small">Nauthólsvík</div>
+        </div>
+        <div class="metric">
+          <div class="label">Vindur</div>
+          <div class="value" id="wind">—</div>
+          <div class="small">síðasta athugun</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">Sjósund Nauthólsvík</div>
+  </main>
+
+<script>
+const FALLBACK_TIDES = {
+  date:"2026-06-30",
+  events: [
+    {type:"low",  time:"00:44", height:0.88, minute:44},
+    {type:"high", time:"06:43", height:3.22, minute:403},
+    {type:"low",  time:"12:45", height:0.82, minute:765},
+    {type:"high", time:"19:04", height:3.64, minute:1144}
+  ],
+  calcEvents: [
+    {type:"low",  time:"00:44", height:0.88, minute:44},
+    {type:"high", time:"06:43", height:3.22, minute:403},
+    {type:"low",  time:"12:45", height:0.82, minute:765},
+    {type:"high", time:"19:04", height:3.64, minute:1144},
+    {type:"low",  time:"01:20", height:0.81, minute:1520, nextDay:true}
+  ]
+};
+
+const FALLBACK_NAUTH = {
+  seaTemp:"11.9",
+  airTemp:"11",
+  wind:"5",
+  updated:"30/6/2026 00:00"
+};
+
+function parseTimeToMinutes(t){const[h,m]=t.split(":").map(Number);return h*60+m}
+function eventMinute(e){return typeof e.minute==="number"?e.minute:parseTimeToMinutes(e.time)}
+function displayMinute(minute){const m=((minute%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
+function nowMinutes(){const d=new Date();return d.getHours()*60+d.getMinutes()}
+function formatMeters(v){return v==null||isNaN(v)?"—":Number(v).toFixed(2).replace(".",",")+" m"}
+function eventName(type){return type==="high"?"Flóð":"Fjara"}
+
+function estimateAtMinutes(events, mins){
+  const sorted=[...events].sort((a,b)=>eventMinute(a)-eventMinute(b));
+  let prev=null,next=null;
+  for(let i=0;i<sorted.length-1;i++){
+    const a=sorted[i],b=sorted[i+1];
+    if(mins>=eventMinute(a)&&mins<=eventMinute(b)){prev=a;next=b;break}
+  }
+  if(!prev||!next){
+    if(mins<eventMinute(sorted[0])){
+      prev={...sorted[sorted.length-1], minute:eventMinute(sorted[sorted.length-1])-1440};
+      next=sorted[0];
+    }else{return null}
+  }
+  const aMin=eventMinute(prev), bMin=eventMinute(next);
+  const ratio=Math.max(0,Math.min(1,(mins-aMin)/(bMin-aMin)));
+  const smooth=(1-Math.cos(ratio*Math.PI))/2;
+  return {height:+(prev.height+(next.height-prev.height)*smooth).toFixed(2), prev, next, ratio};
+}
+
+function findNextEvent(events){
+  const mins=nowMinutes();
+  const sorted=[...events].sort((a,b)=>eventMinute(a)-eventMinute(b));
+  return sorted.find(e=>eventMinute(e)>=mins)||sorted[0];
+}
+
+function buildChartEvents(calcEvents){
+  const today=calcEvents.filter(e=>eventMinute(e)>=0&&eventMinute(e)<=1440);
+  const endEst=estimateAtMinutes(calcEvents,1440);
+  if(endEst) today.push({type:"synthetic", time:"24:00", minute:1440, height:endEst.height});
+  return today.sort((a,b)=>eventMinute(a)-eventMinute(b));
+}
+
+function renderChart(events, calcEvents){
+  const svg=document.getElementById("tideChart");
+  const chartEvents=buildChartEvents(calcEvents);
+  const minsNow=nowMinutes();
+  const est=estimateAtMinutes(calcEvents, minsNow);
+
+  const rawMin=Math.min(...chartEvents.map(e=>e.height), est?est.height:999);
+  const rawMax=Math.max(...chartEvents.map(e=>e.height), est?est.height:-999);
+
+  const minH=Math.floor((rawMin-.1)/0.2)*0.2;
+  const maxH=Math.ceil((rawMax+.1)/0.2)*0.2;
+
+  const W=390,H=205,left=42,right=12,top=16,bottom=38;
+  const plotW=W-left-right,plotH=H-top-bottom;
+  const xMin=m=>left+(Math.max(0,Math.min(1440,m))/1440)*plotW;
+  const y=h=>top+(maxH-h)/Math.max(.2,maxH-minH)*plotH;
+
+  const points=chartEvents.map(e=>[xMin(eventMinute(e)),y(e.height)]);
+  let path=`M${points[0][0]},${points[0][1]}`;
+  for(let i=0;i<points.length-1;i++){
+    const[x1,y1]=points[i],[x2,y2]=points[i+1];
+    const midX=(x1+x2)/2;
+    path+=` C${midX},${y1} ${midX},${y2} ${x2},${y2}`;
+  }
+  const fillPath=`${path} L${left+plotW},${top+plotH} L${left},${top+plotH}Z`;
+
+  const yTicks=[];
+  for(let v=minH; v<=maxH+0.001; v+=0.2) yTicks.push(+v.toFixed(1));
+  const yGrid=yTicks.map(v=>`
+    <line x1="${left}" x2="${left+plotW}" y1="${y(v)}" y2="${y(v)}" stroke="rgba(255,255,255,.11)"/>
+    <text x="4" y="${y(v)+4}" fill="#d8eef6" font-size="10">${String(v.toFixed(1)).replace(".",",")} m</text>`).join("");
+
+  let xGrid="";
+  for(let m=0;m<=1440;m+=180){
+    const label=m===1440?"24":String(Math.floor(m/60)).padStart(2,"0");
+    xGrid+=`
+      <line x1="${xMin(m)}" x2="${xMin(m)}" y1="${top}" y2="${top+plotH}" stroke="rgba(255,255,255,.08)"/>
+      <text x="${xMin(m)-7}" y="${H-8}" fill="#d8eef6" font-size="11">${label}</text>`;
+  }
+
+  const eventDots=events.map(e=>{
+    const px=xMin(eventMinute(e)), py=y(e.height);
+    const color=e.type==="high"?"#ffd45e":"#74f0ff";
+    const textY=e.type==="high"?py-12:py+22;
+    const labelX=Math.max(40,Math.min(px-24,325));
+    return `
+      <circle cx="${px}" cy="${py}" r="5.5" fill="${color}" stroke="white" stroke-width="1.5"/>
+      <text x="${labelX}" y="${textY}" fill="#f7fcff" font-size="10" font-weight="700">${e.time}</text>
+      <text x="${labelX}" y="${textY+12}" fill="#b5ccd7" font-size="10">${String(e.height).replace(".",",")} m</text>`;
+  }).join("");
+
+  let nowMarkup="";
+  if(est){
+    const px=xMin(minsNow), py=y(est.height);
+    nowMarkup=`
+      <line x1="${px}" x2="${px}" y1="${top}" y2="${top+plotH}" stroke="#ff6fb1" stroke-width="2" stroke-dasharray="5 5"/>
+      <circle cx="${px}" cy="${py}" r="8" fill="#ff6fb1" stroke="white" stroke-width="2.5"/>
+      <circle cx="${px}" cy="${py}" r="13" fill="none" stroke="rgba(255,111,177,.45)" stroke-width="3"/>`;
+  }
+
+  svg.innerHTML=`
+    <defs><linearGradient id="sea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#74f0ff" stop-opacity=".62"/><stop offset="1" stop-color="#74f0ff" stop-opacity=".04"/></linearGradient></defs>
+    <rect x="${left}" y="${top}" width="${plotW}" height="${plotH}" rx="16" fill="rgba(255,255,255,.035)"/>
+    ${yGrid}${xGrid}
+    <path d="${fillPath}" fill="url(#sea)"/>
+    <path d="${path}" fill="none" stroke="#74f0ff" stroke-width="4" stroke-linecap="round"/>
+    ${eventDots}${nowMarkup}`;
+}
+
+function updateMeasurementLine(updated){
+  document.getElementById("measurementUpdated").textContent =
+    `Síðasta athugun Nauthólsvíkur: ${updated || "—"}`;
+}
+
+
+
+function isoLocalToday(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function formatIcelandicDate(dateValue){
+  if(!dateValue || dateValue === "—") return "—";
+
+  // Tekur við ISO-formi eins og 2026-06-30 og birtir íslenskt dagsetningarform.
+  const iso = String(dateValue).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(!iso) return dateValue;
+
+  const year = Number(iso[1]);
+  const month = Number(iso[2]);
+  const day = Number(iso[3]);
+
+  const d = new Date(Date.UTC(year, month - 1, day));
+  const weekdays = [
+    "sunnudagur",
+    "mánudagur",
+    "þriðjudagur",
+    "miðvikudagur",
+    "fimmtudagur",
+    "föstudagur",
+    "laugardagur"
+  ];
+  const months = [
+    "janúar",
+    "febrúar",
+    "mars",
+    "apríl",
+    "maí",
+    "júní",
+    "júlí",
+    "ágúst",
+    "september",
+    "október",
+    "nóvember",
+    "desember"
+  ];
+
+  return `${weekdays[d.getUTCDay()]} ${day}. ${months[month - 1]} ${year}`;
+}
+
+function renderTides(data){
+  const events=data.events||FALLBACK_TIDES.events;
+  const calcEvents=data.calcEvents||FALLBACK_TIDES.calcEvents;
+  const est=estimateAtMinutes(calcEvents, nowMinutes());
+  const next=findNextEvent(calcEvents);
+
+  document.getElementById("currentHeight").textContent=est?formatMeters(est.height):"—";
+  document.getElementById("tideState").textContent=next?.type==="high"?"Hækkandi sjór":"Lækkandi sjór";
+  document.getElementById("nextTime").textContent=next?displayMinute(eventMinute(next)):"—";
+  document.getElementById("nextHeight").textContent=next?`${eventName(next.type)} • ${formatMeters(next.height)}`:"—";
+
+  renderChart(events,calcEvents);
+
+  const now=new Date();
+  const nowLabel=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  const tideDate = formatIcelandicDate(isoLocalToday());
+  const currentHeight = document.getElementById("currentHeight").textContent || "—";
+  document.getElementById("tideDate").innerHTML =
+    `<span>Flóðagögn Reykjavík: ${tideDate}</span><span class="subline">Núna ${nowLabel} • ${currentHeight}</span>`;
+  updateMeasurementLine(FALLBACK_NAUTH.updated);
+}
+
+function renderNautholsvik(data){
+  document.getElementById("seaTemp").textContent=data.seaTemp?`${String(data.seaTemp).replace(".",",")}°`:"—";
+  document.getElementById("airTemp").textContent=data.airTemp?`${String(data.airTemp).replace(".",",")}°`:"—";
+  document.getElementById("wind").textContent=data.wind?`${String(data.wind).replace(".",",")} m/s`:"—";
+  updateMeasurementLine(data.updated);
+}
+
+async function fetchJsonWithTimeout(url, ms=2500){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),ms);
+  try{
+    const r=await fetch(url+"?t="+Date.now(),{signal:controller.signal});
+    if(!r.ok) throw new Error(String(r.status));
+    return await r.json();
+  }finally{clearTimeout(timer)}
+}
+
+async function init(){
+  // Sýna nothæft app strax. Ekki bíða eftir ytri síðum.
+  renderTides(FALLBACK_TIDES);
+  renderNautholsvik(FALLBACK_NAUTH);
+
+  try{ renderTides(await fetchJsonWithTimeout("/api/tides",2500)); }catch(e){}
+  try{ renderNautholsvik(await fetchJsonWithTimeout("/api/nautholsvik",2500)); }catch(e){}
+}
+init();
+</script>
+</body>
+</html>
