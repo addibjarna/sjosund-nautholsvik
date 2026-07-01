@@ -2,7 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const PORT = 3050;
+const PORT = process.env.PORT || 3050;
 const TIDE_URL = "https://www.tide-forecast.com/locations/Reykjavik-Iceland/tides/latest";
 const NAUTHOLSVIK_URL = "https://nautholsvik.is/nautholsvik-forsida/";
 
@@ -112,7 +112,7 @@ server.listen(PORT,()=>{
   console.log("");
   console.log("===============================================");
   console.log(" Sjósund Nauthólsvík er ræst");
-  console.log(" Opnaðu: http://localhost:3050");
+  console.log(" Opnaðu: Render URL eða http://localhost:3050");
   console.log("===============================================");
   console.log("");
 });
