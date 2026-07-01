@@ -86,18 +86,24 @@ async function getTides() {
 
   const date = parseDateToIso(dateMatch?.[1]);
 
-  // Current Tide-Forecast text looks like:
-  // Low Tide 1:20 AM(Wed 01 July)2.65 ft (0.81 m)
-  // High Tide 7:19 AM(Wed 01 July)10.76 ft (3.28 m)
+  // Mjög víður parser:
+  // Finnur "Low Tide" eða "High Tide", tíma og næstu hæð í metrum á eftir.
+  // Virkar þó Tide-Forecast setji feet á undan, metra á undan, eða breyti bilum/svigum.
   const rows = [];
-  const rowRe = /(Low Tide|High Tide)\s+(\d{1,2}:\d{2})\s*(AM|PM)\([^)]*\)\s*[0-9.]+\s*ft\s*\(([0-9.]+)\s*m\)/gi;
+  const tideRe = /(Low Tide|High Tide)\s+(\d{1,2}:\d{2})\s*(AM|PM)[\s\S]{0,120}?([0-9]+(?:\.[0-9]+)?)\s*m\b/gi;
+
   let match;
-  while ((match = rowRe.exec(text)) !== null && rows.length < 4) {
+  while ((match = tideRe.exec(text)) !== null && rows.length < 4) {
     const time = normalizeTime(match[2], match[3]);
+    const height = Number(match[4]);
+
+    // Verjast því að grípa eitthvað augljóslega rangt.
+    if (!Number.isFinite(height) || height < 0 || height > 8) continue;
+
     rows.push({
       type: match[1].toLowerCase().startsWith("high") ? "high" : "low",
       time,
-      height: Number(match[4]),
+      height,
       minute: timeToMinute(time)
     });
   }

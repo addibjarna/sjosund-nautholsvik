@@ -1,6 +1,6 @@
 {
   "name": "sjosund-nautholsvik",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Sjósund Nauthólsvík app með flóðagögnum og mælingum frá Nauthólsvík.",
   "main": "server.js",
