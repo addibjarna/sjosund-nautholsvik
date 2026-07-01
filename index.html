@@ -100,7 +100,7 @@
     .event:nth-child(even){background:linear-gradient(135deg,rgba(255,212,94,.20),rgba(255,157,77,.08))}
     .event b{font-size:15px}.event span{font-size:12px;color:var(--muted)}
     .event strong{font-size:17px;background:rgba(255,255,255,.12);border-radius:999px;padding:7px 10px}
-    .footer{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
+    .errorbox{padding:18px;border-radius:22px;background:rgba(255,109,109,.12);border:1px solid rgba(255,109,109,.28);color:#ffdede;line-height:1.35}.footer{color:var(--muted);text-align:center;font-size:12px;margin-top:22px}
   </style>
 </head>
 <body>
@@ -156,23 +156,6 @@
   </main>
 
 <script>
-const FALLBACK_TIDES = {
-  date:"2026-06-30",
-  events: [
-    {type:"low",  time:"00:44", height:0.88, minute:44},
-    {type:"high", time:"06:43", height:3.22, minute:403},
-    {type:"low",  time:"12:45", height:0.82, minute:765},
-    {type:"high", time:"19:04", height:3.64, minute:1144}
-  ],
-  calcEvents: [
-    {type:"low",  time:"00:44", height:0.88, minute:44},
-    {type:"high", time:"06:43", height:3.22, minute:403},
-    {type:"low",  time:"12:45", height:0.82, minute:765},
-    {type:"high", time:"19:04", height:3.64, minute:1144},
-    {type:"low",  time:"01:20", height:0.81, minute:1520, nextDay:true}
-  ]
-};
-
 const FALLBACK_NAUTH = {
   seaTemp:"11.9",
   airTemp:"11",
@@ -343,8 +326,9 @@ function formatIcelandicDate(dateValue){
 }
 
 function renderTides(data){
-  const events=data.events||FALLBACK_TIDES.events;
-  const calcEvents=data.calcEvents||FALLBACK_TIDES.calcEvents;
+  if(!data || !data.events || data.events.length < 4 || data.date !== isoLocalToday()) throw new Error('Engin gild flóðagögn fyrir daginn');
+  const events=data.events;
+  const calcEvents=data.calcEvents||data.events;
   const est=estimateAtMinutes(calcEvents, nowMinutes());
   const next=findNextEvent(calcEvents);
 
@@ -361,7 +345,6 @@ function renderTides(data){
   const currentHeight = document.getElementById("currentHeight").textContent || "—";
   document.getElementById("tideDate").innerHTML =
     `<span>Flóðagögn Reykjavík: ${tideDate}</span><span class="subline">Núna ${nowLabel} • ${currentHeight}</span>`;
-  updateMeasurementLine(FALLBACK_NAUTH.updated);
 }
 
 function renderNautholsvik(data){
@@ -371,23 +354,32 @@ function renderNautholsvik(data){
   updateMeasurementLine(data.updated);
 }
 
+
+function renderNoTides(){
+  document.getElementById("currentHeight").textContent="—";
+  document.getElementById("tideState").textContent="Vantar flóðagögn";
+  document.getElementById("nextTime").textContent="—";
+  document.getElementById("nextHeight").textContent="—";
+  const today = formatIcelandicDate(isoLocalToday());
+  document.getElementById("tideDate").innerHTML =
+    `<span>Flóðagögn Reykjavík: ${today}</span><span class="subline">Náði ekki að sækja ný gögn</span>`;
+  document.getElementById("tideChart").innerHTML =
+    '<foreignObject x="0" y="0" width="390" height="205"><div xmlns="http://www.w3.org/1999/xhtml" class="errorbox">Náði ekki að sækja flóðagögn dagsins. Appið sýnir ekki gamla töflu.</div></foreignObject>';
+}
+
 async function fetchJsonWithTimeout(url, ms=2500){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),ms);
   try{
-    const r=await fetch(url+"?t="+Date.now(),{signal:controller.signal});
+    const r=await fetch(url+"?t="+Date.now(),{signal:controller.signal,cache:"no-store"});
     if(!r.ok) throw new Error(String(r.status));
     return await r.json();
   }finally{clearTimeout(timer)}
 }
 
 async function init(){
-  // Sýna nothæft app strax. Ekki bíða eftir ytri síðum.
-  renderTides(FALLBACK_TIDES);
-  renderNautholsvik(FALLBACK_NAUTH);
-
-  try{ renderTides(await fetchJsonWithTimeout("/api/tides",2500)); }catch(e){}
-  try{ renderNautholsvik(await fetchJsonWithTimeout("/api/nautholsvik",2500)); }catch(e){}
+  try{ renderTides(await fetchJsonWithTimeout("/api/tides",5000)); }catch(e){ renderNoTides(); }
+  try{ renderNautholsvik(await fetchJsonWithTimeout("/api/nautholsvik",5000)); }catch(e){ renderNautholsvik(FALLBACK_NAUTH); }
 }
 init();
 </script>
